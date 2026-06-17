@@ -13,7 +13,9 @@ class EventController extends Controller
 {
     public function index()
     {
-        $events = Event::with(['category', 'organizer'])->get();
+        $events = Event::with(['category', 'organizer'])
+            ->latest()
+            ->paginate(9);
 
         return view('events.index', compact('events'));
     }
@@ -27,19 +29,16 @@ class EventController extends Controller
 
     public function store(StoreEventRequest $request)
     {
-        $bannerPath = $request->file('banner')
-            ->store('events', 'public');
+        $data = $request->validated();
 
-        Event::create([
-            'title' => $request->title,
-            'description' => $request->description,
-            'date_time' => $request->date_time,
-            'location' => $request->location,
-            'capacity' => $request->capacity,
-            'banner_path' => $bannerPath,
-            'category_id' => $request->category_id,
-            'user_id' => Auth::id(),
-        ]);
+        if ($request->hasFile('banner')) {
+            $data['banner_path'] = $request->file('banner')
+                ->store('events', 'public');
+        }
+
+        $data['user_id'] = Auth::id();
+
+        Event::create($data);
 
         return redirect()
             ->route('events.index')
@@ -54,37 +53,28 @@ class EventController extends Controller
     }
 
     public function edit(Event $event)
-{
-    if ($event->user_id !== Auth::id()) {
-        abort(403);
+    {
+        abort_if($event->user_id !== Auth::id(), 403);
+
+        $categories = Category::all();
+
+        return view('events.edit', compact('event', 'categories'));
     }
-
-    $categories = Category::all();
-
-    return view('events.edit', compact('event', 'categories'));
-}
 
     public function update(UpdateEventRequest $request, Event $event)
     {
+        abort_if($event->user_id !== Auth::id(), 403);
+
         $data = $request->validated();
 
-        if ($event->user_id !== Auth::id()) {
-    abort(403);
-}
-
         if ($request->hasFile('banner')) {
-
             if ($event->banner_path) {
-                Storage::disk('public')
-                    ->delete($event->banner_path);
+                Storage::disk('public')->delete($event->banner_path);
             }
 
-            $data['banner_path'] = $request
-                ->file('banner')
+            $data['banner_path'] = $request->file('banner')
                 ->store('events', 'public');
         }
-
-        unset($data['banner']);
 
         $event->update($data);
 
@@ -93,20 +83,18 @@ class EventController extends Controller
             ->with('success', 'Evento atualizado com sucesso.');
     }
 
-        public function destroy(Event $event)
-{
-    if ($event->user_id !== Auth::id()) {
-        abort(403);
+    public function destroy(Event $event)
+    {
+        abort_if($event->user_id !== Auth::id(), 403);
+
+        if ($event->banner_path) {
+            Storage::disk('public')->delete($event->banner_path);
+        }
+
+        Event::destroy($event->id);
+
+        return redirect()
+            ->route('events.index')
+            ->with('success', 'Evento removido com sucesso.');
     }
-
-    if ($event->banner_path) {
-        Storage::disk('public')->delete($event->banner_path);
-    }
-
-    Event::destroy($event->id);
-
-    return redirect()
-        ->route('events.index')
-        ->with('success', 'Evento removido com sucesso.');
-}
 }

@@ -1,64 +1,149 @@
 <x-guest-layout>
-    <form method="POST" action="{{ route('register') }}">
-        @csrf
+<div class="min-h-screen flex items-center justify-center px-4 py-10">
 
-        <!-- Name -->
-        <div>
-            <x-input-label for="name" :value="__('Name')" />
-            <x-text-input id="name" class="block mt-1 w-full" type="text" name="name" :value="old('name')" required autofocus autocomplete="name" />
-            <x-input-error :messages="$errors->get('name')" class="mt-2" />
+    <div class="w-full max-w-md">
+
+        {{-- Logo --}}
+        <div class="text-center mb-8">
+            <div class="w-12 h-12 rounded-2xl flex items-center justify-center mx-auto mb-4" style="background: rgba(255,255,255,0.2);">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"/>
+                </svg>
+            </div>
+            <h1 class="text-2xl font-semibold text-white">Criar sua conta</h1>
+            <p class="text-white/70 text-sm mt-1">Junte-se à plataforma de eventos</p>
         </div>
 
-        <!-- Email Address -->
-        <div class="mt-4">
-    <x-input-label for="email" value="Email" />
+        {{-- Card --}}
+        <div class="card bg-base-100 shadow-2xl">
+            <div class="card-body gap-4">
 
-    <x-text-input
-        id="email"
-        class="block mt-1 w-full"
-        type="email"
-        name="email"
-        :value="old('email')"
-        required
-    />
+                @if($errors->any())
+                    <div class="alert alert-error text-sm">
+                        <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                        <span>Corrija os erros abaixo para continuar.</span>
+                    </div>
+                @endif
 
-    <x-input-error
-        :messages="$errors->get('email')"
-        class="mt-2"
-    />
-</div>
+                <form method="POST" action="{{ route('register') }}" class="flex flex-col gap-4">
+                    @csrf
 
-        <!-- Password -->
-        <div class="mt-4">
-            <x-input-label for="password" :value="__('Password')" />
+                    {{-- Nome --}}
+                    <div class="form-control gap-1">
+                        <label class="label py-0">
+                            <span class="label-text text-sm font-medium">Nome completo</span>
+                        </label>
+                        <input
+                            type="text"
+                            name="name"
+                            value="{{ old('name') }}"
+                            placeholder="Seu nome"
+                            class="input input-bordered w-full @error('name') input-error @enderror"
+                            required
+                        >
+                        @error('name')
+                            <span class="text-error text-xs">{{ $message }}</span>
+                        @enderror
+                    </div>
 
-            <x-text-input id="password" class="block mt-1 w-full"
+                    {{-- E-mail --}}
+                    <div class="form-control gap-1">
+                        <label class="label py-0">
+                            <span class="label-text text-sm font-medium">E-mail</span>
+                        </label>
+                        <input
+                            type="email"
+                            name="email"
+                            value="{{ old('email') }}"
+                            placeholder="seuemail@exemplo.com"
+                            class="input input-bordered w-full @error('email') input-error @enderror"
+                            required
+                        >
+                        @error('email')
+                            <span class="text-error text-xs">{{ $message }}</span>
+                        @enderror
+                    </div>
+
+                    {{-- Senha --}}
+                    <div class="form-control gap-1">
+                        <label class="label py-0">
+                            <span class="label-text text-sm font-medium">Senha</span>
+                        </label>
+                        <input
                             type="password"
                             name="password"
-                            required autocomplete="new-password" />
+                            placeholder="Mínimo 8 caracteres"
+                            class="input input-bordered w-full @error('password') input-error @enderror"
+                            required
+                        >
+                        @error('password')
+                            <span class="text-error text-xs">{{ $message }}</span>
+                        @enderror
+                    </div>
 
-            <x-input-error :messages="$errors->get('password')" class="mt-2" />
-        </div>
-
-        <!-- Confirm Password -->
-        <div class="mt-4">
-            <x-input-label for="password_confirmation" :value="__('Confirm Password')" />
-
-            <x-text-input id="password_confirmation" class="block mt-1 w-full"
+                    {{-- Confirmar senha --}}
+                    <div class="form-control gap-1">
+                        <label class="label py-0">
+                            <span class="label-text text-sm font-medium">Confirmar senha</span>
+                        </label>
+                        <input
                             type="password"
-                            name="password_confirmation" required autocomplete="new-password" />
+                            name="password_confirmation"
+                            placeholder="Repita a senha"
+                            class="input input-bordered w-full"
+                            required
+                        >
+                    </div>
 
-            <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
+                    {{-- Perfil de acesso (RF01) --}}
+                    <div class="form-control gap-2">
+                        <label class="label py-0">
+                            <span class="label-text text-sm font-medium">Tipo de conta</span>
+                        </label>
+
+                        <label class="flex items-start gap-3 p-3 rounded-xl border-2 cursor-pointer transition-colors
+                            {{ old('role') === 'participant' ? 'border-primary bg-primary/5' : 'border-base-300 hover:border-primary/40' }}">
+                            <input type="radio" name="role" value="participant" class="radio radio-primary mt-0.5"
+                                {{ old('role') === 'participant' ? 'checked' : '' }}>
+                            <div>
+                                <p class="text-sm font-medium">Participante</p>
+                                <p class="text-xs text-base-content/50">Quero descobrir e me inscrever em eventos</p>
+                            </div>
+                        </label>
+
+                        <label class="flex items-start gap-3 p-3 rounded-xl border-2 cursor-pointer transition-colors
+                            {{ old('role') === 'organizer' ? 'border-primary bg-primary/5' : 'border-base-300 hover:border-primary/40' }}">
+                            <input type="radio" name="role" value="organizer" class="radio radio-primary mt-0.5"
+                                {{ old('role') === 'organizer' ? 'checked' : '' }}>
+                            <div>
+                                <p class="text-sm font-medium">Organizador</p>
+                                <p class="text-xs text-base-content/50">Quero criar e gerenciar meus próprios eventos</p>
+                            </div>
+                        </label>
+
+                        @error('role')
+                            <span class="text-error text-xs">{{ $message }}</span>
+                        @enderror
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-full mt-2">
+                        Criar conta
+                    </button>
+
+                </form>
+
+                <p class="text-center text-sm text-base-content/60">
+                    Já tem conta?
+                    <a href="{{ route('login') }}" class="text-primary font-medium hover:underline">
+                        Entrar
+                    </a>
+                </p>
+
+            </div>
         </div>
 
-        <div class="flex items-center justify-end mt-4">
-            <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('login') }}">
-                {{ __('Already registered?') }}
-            </a>
-
-            <x-primary-button class="ms-4">
-                {{ __('Register') }}
-            </x-primary-button>
-        </div>
-    </form>
+    </div>
+</div>
 </x-guest-layout>
