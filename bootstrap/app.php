@@ -11,12 +11,11 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-
+        // Registro dos aliases de middleware personalizados
         $middleware->alias([
-            'organizer' => \App\Http\Middleware\OrganizerMiddleware::class,
+            'organizer'   => \App\Http\Middleware\OrganizerMiddleware::class,
             'participant' => \App\Http\Middleware\ParticipantMiddleware::class,
         ]);
-
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

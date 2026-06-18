@@ -10,16 +10,19 @@ use Symfony\Component\HttpFoundation\Response;
 class OrganizerMiddleware
 {
     /**
-     * Handle an incoming request.
+     * Garante que o usuário logado tenha perfil de organizador.
+     * Se não estiver autenticado, redireciona para login.
+     * Se for de outro perfil, retorna para a home com aviso.
      */
     public function handle(Request $request, Closure $next): Response
     {
         if (!Auth::check()) {
-            return redirect('/login');
+            return redirect()->route('login');
         }
 
         if (Auth::user()->role !== 'organizer') {
-            abort(403);
+            return redirect()->route('home')
+                ->with('error', 'Acesso restrito a organizadores.');
         }
 
         return $next($request);
