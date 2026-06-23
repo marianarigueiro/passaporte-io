@@ -72,7 +72,7 @@ Relacionamentos:
 
 1. **Clone o repositório**
    ```bash
-   git clone https://github.com/seuusuario/passaporte-io.git
+   git clone https://github.com/marianarigueiro/passaporte-io.git
    cd passaporte-io
 
    composer install
