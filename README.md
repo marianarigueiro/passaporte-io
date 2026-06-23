@@ -112,6 +112,9 @@ A exclusão de evento é bloqueada se houver inscrições ativas, conforme regra
 
 As rotas administrativas são protegidas por middleware que verifica o perfil (organizer) e a propriedade do registro.
 
+## URL do site
+https://passaporte-io-production-d027.up.railway.app/
+
 ## Licença
 
 Projeto acadêmico – uso livre para fins educacionais.
